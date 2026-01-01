@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "rootDir": "..",
+    "outDir": "./build",
+    "module": "ES2022",
+    "target": "ES2022",
+    "lib": [
+      "ES2022"
+    ],
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
+}

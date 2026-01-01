@@ -1,0 +1,26 @@
+{
+  "name": "Backend Dev Container",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "backend_app",
+  "workspaceFolder": "/app",
+  "shutdownAction": "none",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "typescript.tsdk": "/app/node_modules/typescript/lib",
+        "javascript.suggest.autoImports": true,
+        "typescript.suggest.autoImports": true
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "naumovs.color-highlight",
+        "eamodio.gitlens",
+        "wix.vscode-import-cost",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  },
+  // Mount project + keep working directory correct
+  "remoteUser": "root"
+}
