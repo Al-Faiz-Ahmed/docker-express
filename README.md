@@ -2,30 +2,15 @@
 
 A RESTful API for managing pets built with Express.js, TypeScript, Drizzle ORM, and PostgreSQL, containerized with Docker.
 
-## 📋 Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Project Structure](#project-structure)
-- [Docker Setup](#docker-setup)
-- [Step-by-Step Instructions](#step-by-step-instructions)
-- [API Endpoints](#api-endpoints)
-- [Database Management](#database-management)
-- [Troubleshooting](#troubleshooting)
-
 ## Prerequisites
-
-Before you begin, ensure you have the following installed on your system:
 
 - **Docker** (version 20.10 or higher)
 - **Docker Compose** (version 2.0 or higher)
-- **Git** (for cloning the repository)
 
-To verify your installations:
-
+Verify installations:
 ```bash
 docker --version
 docker-compose --version
-git --version
 ```
 
 ## Project Structure
@@ -38,171 +23,155 @@ git --version
 │   ├── database/          # Database configuration and schema
 │   ├── middleware/        # Express middleware
 │   └── index.ts           # Application entry point
-├── drizzle/               # Database migrations
-├── Dockerfile             # Backend container configuration
-├── docker-compose.yml     # Multi-container setup
+├── Dockerfile.dev         # Development container configuration
+├── Dockerfile.prod        # Production container configuration
+├── docker-compose.dev.yml # Development multi-container setup
+├── docker-compose.prod.yml # Production multi-container setup
 ├── package.json           # Node.js dependencies
 └── tsconfig.json          # TypeScript configuration
 ```
 
-## Docker Setup
+## Development Mode
 
-This project uses Docker Compose to orchestrate two containers:
-- **Backend App**: Node.js/Express API server
-- **PostgreSQL**: Database server
-
-## Step-by-Step Instructions
-
-### Step 1: Clone the Repository
-
-If you haven't already, clone or navigate to the project directory:
+### Start Development Environment
 
 ```bash
-cd /path/to/your/project
+# Build and start all services
+docker-compose -f docker-compose.dev.yml up -d --build
+
+# Or start in foreground to see logs
+docker-compose -f docker-compose.dev.yml up --build
 ```
 
-### Step 2: Check Docker and Docker Compose
+This will:
+- Build the backend application using `Dockerfile.dev`
+- Start PostgreSQL database on port `5432`
+- Start backend API server on port `5000`
+- Mount your local code for hot-reload development
 
-Verify that Docker and Docker Compose are running:
+### Access Development Container
 
 ```bash
-# Check Docker daemon
-docker ps
+# Enter the backend container
+docker-compose -f docker-compose.dev.yml exec backend_app bash
 
-# Check Docker Compose
-docker-compose --version
+# Inside container, you can run:
+npm run dev          # Start development server (already running via CMD)
+npm run build        # Build TypeScript to JavaScript
+npm run db:generate  # Generate database migrations
+npm run db:migrate   # Run database migrations
 ```
 
-If Docker is not running, start it:
-- **Linux**: `sudo systemctl start docker`
-- **macOS/Windows**: Start Docker Desktop application
-
-### Step 3: Build Docker Images
-
-Build the Docker images for all services defined in `docker-compose.yml`:
+### View Logs
 
 ```bash
-docker-compose build
-```
-
-This command will:
-- Build the backend application image (`backend_app_start:local`)
-- Pull the PostgreSQL 16 image (if not already present)
-- Install all Node.js dependencies
-
-**Alternative: Build without cache** (if you encounter dependency issues):
-
-```bash
-docker-compose build --no-cache
-```
-
-### Step 4: Start All Services
-
-Start all containers in detached mode (runs in background):
-
-```bash
-docker-compose up -d
-```
-
-**Or start in foreground** (to see logs):
-
-```bash
-docker-compose up
-```
-
-This will start:
-- PostgreSQL database on port `5432`
-- Backend API server on port `5000`
-
-### Step 5: Verify Containers are Running
-
-Check the status of your containers:
-
-```bash
-docker-compose ps
-```
-
-You should see both containers with status "Up":
-- `faizan_container` (backend)
-- `my-postgres` (database)
-
-**Alternative command:**
-
-```bash
-docker ps
-```
-
-### Step 6: View Container Logs
-
-To see the logs from all services:
-
-```bash
-docker-compose logs
-```
-
-**View logs for specific service:**
-
-```bash
-# Backend logs
-docker-compose logs backend_app
-
-# Database logs
-docker-compose logs postgres
+# View all logs
+docker-compose -f docker-compose.dev.yml logs
 
 # Follow logs in real-time
-docker-compose logs -f backend_app
+docker-compose -f docker-compose.dev.yml logs -f
+
+# View specific service logs
+docker-compose -f docker-compose.dev.yml logs -f backend_app
+docker-compose -f docker-compose.dev.yml logs -f postgres
 ```
 
-### Step 7: Access the Backend Container
-
-To execute commands inside the backend container:
+### Stop Development Environment
 
 ```bash
-docker-compose exec backend_app bash
+# Stop services
+docker-compose -f docker-compose.dev.yml stop
+
+# Stop and remove containers
+docker-compose -f docker-compose.dev.yml down
+
+# Stop and remove containers with volumes
+docker-compose -f docker-compose.dev.yml down -v
 ```
 
-Once inside, you can run:
-- `npm run dev` - Start development server
-- `npm run build` - Build TypeScript to JavaScript
-- `npm run db:generate` - Generate database migrations
-- `npm run db:migrate` - Run database migrations
+## Production Mode
 
-### Step 8: Run Database Migrations
-
-Execute database migrations inside the container:
+### Build and Start Production Environment
 
 ```bash
-# Option 1: Execute from outside container
-docker-compose exec backend_app npm run db:migrate
+# Build and start all services
+docker-compose -f docker-compose.prod.yml up -d --build
 
-# Option 2: Enter container first, then run
-docker-compose exec backend_app bash
-npm run db:migrate
+# Or start in foreground to see logs
+docker-compose -f docker-compose.prod.yml up --build
 ```
 
-### Step 9: Test the API
+This will:
+- Build the backend application using `Dockerfile.prod` (multi-stage build)
+- Start PostgreSQL database on port `5432`
+- Start backend API server on port `5000` (running compiled JavaScript)
 
-The API should now be accessible at:
-
-- **Base URL**: `http://localhost:5000`
-- **Health Check**: `http://localhost:5000/`
-
-Test with curl:
+### View Production Logs
 
 ```bash
-curl http://localhost:5000/
+# View all logs
+docker-compose -f docker-compose.prod.yml logs
+
+# Follow logs in real-time
+docker-compose -f docker-compose.prod.yml logs -f
+
+# View specific service logs
+docker-compose -f docker-compose.prod.yml logs -f backend
+docker-compose -f docker-compose.prod.yml logs -f postgres
 ```
 
-Or open in your browser: `http://localhost:5000/`
+### Stop Production Environment
+
+```bash
+# Stop services
+docker-compose -f docker-compose.prod.yml stop
+
+# Stop and remove containers
+docker-compose -f docker-compose.prod.yml down
+
+# Stop and remove containers with volumes
+docker-compose -f docker-compose.prod.yml down -v
+```
+
+## Database Management
+
+### Run Migrations
+
+**Development:**
+```bash
+docker-compose -f docker-compose.dev.yml exec backend_app npm run db:migrate
+```
+
+**Production:**
+```bash
+docker-compose -f docker-compose.prod.yml exec backend npm run db:migrate
+```
+
+### Access PostgreSQL Database
+
+```bash
+# Development
+docker-compose -f docker-compose.dev.yml exec postgres psql -U postgres -d mydb
+
+# Production
+docker-compose -f docker-compose.prod.yml exec postgres psql -U postgres -d mydb
+```
+
+### Database Credentials
+
+- **Host**: `postgres` (from within Docker network) or `localhost` (from host)
+- **Port**: `5432`
+- **Database**: `mydb`
+- **Username**: `postgres`
+- **Password**: `password`
+- **Connection String**: `postgresql://postgres:password@postgres:5432/mydb`
 
 ## API Endpoints
 
 ### Base Routes
-
 - `GET /` - Home page / Health check
 
 ### Pet Routes (`/api/pet`)
-
 - `GET /api/pet/:id` - Get pet by ID
 - `POST /api/pet/create` - Create a new pet
   ```json
@@ -214,7 +183,6 @@ Or open in your browser: `http://localhost:5000/`
 - `DELETE /api/pet/:id/delete` - Delete pet by ID
 
 ### Pets Routes (`/api/pets`)
-
 - `GET /api/pets` - Get all pets
 - `POST /api/pets/seed-pets` - Seed 15 sample pets
 - `DELETE /api/pets/delete-pets` - Delete all pets
@@ -241,215 +209,79 @@ curl -X POST http://localhost:5000/api/pets/seed-pets
 curl -X DELETE http://localhost:5000/api/pets/delete-pets
 ```
 
-## Database Management
+## Common Docker Commands
 
-### Access PostgreSQL Database
-
-Connect to the PostgreSQL database:
+### Check Container Status
 
 ```bash
-# Using docker-compose
-docker-compose exec postgres psql -U postgres -d mydb
+# Development
+docker-compose -f docker-compose.dev.yml ps
 
-# Or using docker directly
-docker exec -it my-postgres psql -U postgres -d mydb
+# Production
+docker-compose -f docker-compose.prod.yml ps
 ```
 
-### Database Credentials
-
-- **Host**: `postgres` (from within Docker network) or `localhost` (from host)
-- **Port**: `5432`
-- **Database**: `mydb`
-- **Username**: `postgres`
-- **Password**: `password`
-- **Connection String**: `postgresql://postgres:password@postgres:5432/mydb`
-
-### Useful Database Commands
-
-```sql
--- List all tables
-\dt
-
--- Describe pets table
-\d pets
-
--- View all pets
-SELECT * FROM pets;
-
--- Count pets
-SELECT COUNT(*) FROM pets;
-```
-
-## Docker Commands Reference
-
-### Starting and Stopping
+### Restart Services
 
 ```bash
-# Start services
-docker-compose up -d
+# Development
+docker-compose -f docker-compose.dev.yml restart
 
-# Stop services
-docker-compose stop
-
-# Stop and remove containers
-docker-compose down
-
-# Stop and remove containers, volumes, and networks
-docker-compose down -v
+# Production
+docker-compose -f docker-compose.prod.yml restart
 ```
 
-### Rebuilding
+### Rebuild Containers
 
 ```bash
-# Rebuild and restart
-docker-compose up -d --build
+# Development
+docker-compose -f docker-compose.dev.yml build --no-cache
+docker-compose -f docker-compose.dev.yml up -d
 
-# Rebuild without cache
-docker-compose build --no-cache
-docker-compose up -d
-```
-
-### Container Management
-
-```bash
-# View running containers
-docker-compose ps
-
-# View all containers (including stopped)
-docker-compose ps -a
-
-# Restart a specific service
-docker-compose restart backend_app
-
-# Stop a specific service
-docker-compose stop backend_app
-
-# Start a specific service
-docker-compose start backend_app
-```
-
-### Logs and Debugging
-
-```bash
-# View logs
-docker-compose logs
-
-# Follow logs
-docker-compose logs -f
-
-# View last 100 lines
-docker-compose logs --tail=100
-
-# Execute command in container
-docker-compose exec backend_app npm run dev
-```
-
-### Cleanup
-
-```bash
-# Remove stopped containers
-docker-compose rm
-
-# Remove containers and volumes
-docker-compose down -v
-
-# Remove all unused Docker resources
-docker system prune -a
+# Production
+docker-compose -f docker-compose.prod.yml build --no-cache
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ## Troubleshooting
 
-### Issue: Port Already in Use
+### Port Already in Use
 
 **Error**: `Bind for 0.0.0.0:5000 failed: port is already allocated`
 
 **Solution**:
 ```bash
 # Find process using port 5000
-lsof -i :5000  # macOS/Linux
-netstat -ano | findstr :5000  # Windows
+# Windows
+netstat -ano | findstr :5000
 
-# Stop the process or change port in docker-compose.yml
+# Linux/macOS
+lsof -i :5000
 ```
 
-### Issue: Container Won't Start
+### Container Won't Start
 
 **Solution**:
 ```bash
 # Check logs
-docker-compose logs backend_app
+docker-compose -f docker-compose.dev.yml logs backend_app
 
 # Rebuild containers
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
+docker-compose -f docker-compose.dev.yml down
+docker-compose -f docker-compose.dev.yml build --no-cache
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
-### Issue: Database Connection Failed
+### Database Connection Failed
 
 **Solution**:
 ```bash
 # Ensure postgres container is running
-docker-compose ps
+docker-compose -f docker-compose.dev.yml ps
 
 # Check database logs
-docker-compose logs postgres
+docker-compose -f docker-compose.dev.yml logs postgres
 
 # Restart database
-docker-compose restart postgres
+docker-compose -f docker-compose.dev.yml restart postgres
 ```
-
-### Issue: Dependencies Not Installing
-
-**Solution**:
-```bash
-# Remove node_modules volume and rebuild
-docker-compose down -v
-docker-compose build --no-cache
-docker-compose up -d
-```
-
-### Issue: Changes Not Reflecting
-
-**Solution**:
-- The project uses volume mounting, so changes should reflect automatically
-- If not, restart the backend container:
-  ```bash
-  docker-compose restart backend_app
-  ```
-
-### Issue: Permission Denied
-
-**Solution** (Linux):
-```bash
-# Add your user to docker group
-sudo usermod -aG docker $USER
-# Log out and log back in
-```
-
-## Development Workflow
-
-1. **Start services**: `docker-compose up -d`
-2. **Enter container**: `docker-compose exec backend_app bash`
-3. **Start dev server**: `npm run dev`
-4. **Make changes** (files are mounted, changes reflect automatically)
-5. **Run migrations**: `npm run db:migrate`
-6. **Test API**: Use curl or Postman
-
-## Environment Variables
-
-The following environment variables are configured in `docker-compose.yml`:
-
-- `BACKEND_PORT=5000` - Backend server port
-- `DATABASE_URL=postgresql://postgres:password@postgres:5432/mydb` - Database connection string
-- `CHOKIDAR_USEPOLLING=true` - File watching for hot reload
-- `CHOKIDAR_INTERVAL=1000` - File watching interval
-
-## Additional Resources
-
-- [Docker Documentation](https://docs.docker.com/)
-- [Docker Compose Documentation](https://docs.docker.com/compose/)
-- [Drizzle ORM Documentation](https://orm.drizzle.team/)
-- [Express.js Documentation](https://expressjs.com/)
-
-
