@@ -8,8 +8,12 @@ RUN npm install -g npm@11.7.0 typescript@5.9.3 pnpm@10.26.2
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install
 
-CMD ["bash","-c", "echo 'Container Ready Use npm run dev to start'; tail -f /dev/null "]
+RUN pnpm run db:migrate
+
+EXPOSE 5000
+
+CMD ["bash","-c","pnpm run dev"]

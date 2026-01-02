@@ -1,6 +1,6 @@
 {
   "name": "Backend Dev Container",
-  "dockerComposeFile": "../docker-compose.yml",
+  "dockerComposeFile": "../docker-compose.dev.yml",
   "service": "backend_app",
   "workspaceFolder": "/app",
   "shutdownAction": "none",

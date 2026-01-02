@@ -20,6 +20,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true
   },
+  "tsc-alias": {
+   "resolveFullPaths": true
+  },
   "include": [
     "src/**/*"
   ],
@@ -27,4 +30,5 @@
     "node_modules",
     "build"
   ]
+
 }
