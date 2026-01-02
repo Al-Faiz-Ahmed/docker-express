@@ -49,9 +49,64 @@ export const getPetById = async (
       data: pet,
       error: null,
     });
-  } catch (err) {}
+  } catch (err) {
+    next(new GlobalError(500, `details ${err}`, "SERVER INTERNAL ERROR"));
+  }
+};
 
-  res.json(`ok`);
+export const deletePetById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  let id: string | number = req.params.id || "";
+  if (!id) {
+    next(
+      new GlobalError(
+        422,
+        `Id is not provided inside URL`,
+        "ID IN PARAMS REQUIRED"
+      )
+    );
+  }
+
+  if (Object.is(Number(id), NaN) === true) {
+    next(
+      new GlobalError(
+        400,
+        `ID should be a natural number`,
+        "ID SHOULD BE A NUMBER"
+      )
+    );
+  }
+
+  id = Number(id);
+
+  try {
+    const pet = await db
+      .delete(pets)
+      .where(eq(pets.id, id))
+      .returning({ petName: pets.petName });
+    if (pet.length === 0) {
+      return next(
+        new GlobalError(
+          404,
+          `None of the Pet belongs to this id #${id}`,
+          "PET NOT FOUND"
+        )
+      );
+    }
+    res.json({
+      status: "ok",
+      message: "Pet remove Successfully",
+      data: pet,
+      error: null,
+    });
+  } catch (err) {
+    next(new GlobalError(500, `details ${err}`, "SERVER INTERNAL ERROR"));
+  }
+
+  
 };
 
 export const createPet = async (
