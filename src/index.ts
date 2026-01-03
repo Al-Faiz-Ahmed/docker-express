@@ -1,6 +1,6 @@
 import express from "express";
 import type { NextFunction, Request, Response } from "express";
-import type { GlobalError } from "./middleware/global-error";
+import { GlobalError } from "./middleware/global-error";
 import petRoute from "./routes/pet-route";
 import petsRoute from "./routes/pets-route";
 
@@ -16,6 +16,10 @@ app.get("/", (req: Request, res: Response) => {
   res
     .status(200)
     .json({ message: "Home Page Accesssed and Served Successfully!" });
+});
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  return next(new GlobalError(404,`The requested URL ${req.originalUrl} was not found on this server.`,'PAGE NOT FOUND'))
 });
 
 app.use((err: GlobalError, req: Request, res: Response, next: NextFunction) => {
