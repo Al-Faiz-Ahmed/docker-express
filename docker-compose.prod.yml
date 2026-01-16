@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    image: backend-app:1.0.0
+    image: faizahmed546/express-pet:latest
     container_name: backend-prod
     ports:
       - "5000:5000"

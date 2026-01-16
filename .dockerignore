@@ -5,4 +5,8 @@ dist
 .git
 .gitignore
 Dockerfile*
+Dockerfile.dev
+Dockerfile.prod
 docker-compose*
+docker-compose.dev.yml
+docker-compose.prod.yml

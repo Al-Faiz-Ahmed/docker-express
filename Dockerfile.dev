@@ -8,12 +8,10 @@ RUN npm install -g npm@11.7.0 typescript@5.9.3 pnpm@10.26.2
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml drizzle.config.ts tsconfig.json eslint.config.js ./
 
 RUN pnpm install
 
-RUN pnpm run db:migrate
-
 EXPOSE 5000
-
+# Please Run pnpm run db:migrate after launching container inside linux app folder
 CMD ["bash","-c","pnpm run dev"]
