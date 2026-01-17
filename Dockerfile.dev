@@ -13,5 +13,6 @@ COPY package.json pnpm-lock.yaml drizzle.config.ts tsconfig.json eslint.config.j
 RUN pnpm install
 
 EXPOSE 5000
+
 # Please Run pnpm run db:migrate after launching container inside linux app folder
-CMD ["bash","-c","pnpm run dev"]
+CMD ["pnpm", "db:migrate", "&&", "pnpm run dev"]

@@ -23,8 +23,6 @@ COPY --from=builder /app/build ./build
 
 EXPOSE 5000
 
-# CMD ["bash", "-c", ""]
-# CMD ["sh", "-c", "echo 'Container Ready'; tail -f /dev/null"]
-CMD ["pnpm", "db:migrate","&&","node","build/app/src/index.js"]
+ENTRYPOINT ["node","build/app/src/index.js"]
 
     

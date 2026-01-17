@@ -8,19 +8,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      DATABASE_URL: postgresql://postgres:password@postgres:5432/mydb
+      DATABASE_URL: YOUR_PRODUCT_DATABASE_URL
     restart: always
-    depends_on:
-      - postgres
 
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydb
-    volumes:
-      - postgresdata:/var/lib/postgresql/data
-
-volumes:
-  postgresdata:
+  
